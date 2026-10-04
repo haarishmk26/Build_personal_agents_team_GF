@@ -1,20 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import OpenAI from "openai";
-
 @Injectable()
 export class AiGatewayService {
-  async explainPlan(address: string, accountNames: string[]): Promise<string | null> {
-    const token = process.env.NEON_AI_GATEWAY_TOKEN;
-    const baseUrl = process.env.NEON_AI_GATEWAY_BASE_URL;
-    if (!token || !baseUrl) return null;
-    const client = new OpenAI({ apiKey: token, baseURL: `${baseUrl.replace(/\/$/, "")}/v1` });
-    const completion = await client.chat.completions.create({
-      model: process.env.NEON_AI_GATEWAY_MODEL ?? "gpt-5-mini",
-      messages: [
-        { role: "system", content: "You explain a moving-address plan in two concise sentences. Never override safety tiers or authorization rules." },
-        { role: "user", content: `New address: ${address}. Selected accounts: ${accountNames.join(", ")}.` }
-      ]
-    });
-    return completion.choices[0]?.message?.content ?? null;
-  }
+  private client(){const token=process.env.NEON_AI_GATEWAY_TOKEN,base=process.env.NEON_AI_GATEWAY_BASE_URL;if(!token||!base)return null;return new OpenAI({apiKey:token,baseURL:`${base.replace(/\/$/,"")}/v1`});}
+  async classifyMessage(subject:string,domain:string):Promise<{category:string;tier:string}>{const fallback={category:domain.includes("bank")?"bank":"other",tier:domain.includes("bank")?"assist":"mock"};const client=this.client();if(!client)return fallback;try{const r=await client.chat.completions.create({model:process.env.NEON_AI_GATEWAY_MODEL??"gpt-5-mini",response_format:{type:"json_object"},messages:[{role:"system",content:"Classify a life-admin email. Return JSON only: category is gym,gaming,forum,subscription,bank,utility,other; tier is mock,act,assist. Banks must be assist."},{role:"user",content:`sender domain=${domain}; subject=${subject}`} ]});const parsed=JSON.parse(r.choices[0]?.message.content??"{}");return {category:parsed.category??fallback.category,tier:parsed.tier??fallback.tier};}catch{return fallback}}
+  async explainPlan(address:string,names:string[]){const c=this.client();if(!c)return null;const r=await c.chat.completions.create({model:process.env.NEON_AI_GATEWAY_MODEL??"gpt-5-mini",messages:[{role:"system",content:"Explain this approved moving plan in two concise sentences. Never authorize actions."},{role:"user",content:`Address ${address}; accounts ${names.join(", ")}`} ]});return r.choices[0]?.message.content??null;}
 }

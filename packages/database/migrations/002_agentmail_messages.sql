@@ -1,0 +1,1 @@
+create table if not exists agentmail_message (message_id text primary key, user_id text not null references app_user(id), sender text not null, subject text, received_at timestamptz not null, processed_at timestamptz not null default now());

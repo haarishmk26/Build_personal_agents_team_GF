@@ -1,0 +1,6 @@
+import { Injectable, Logger } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
+import { DiscoveryService } from "./discovery.service.js";
+import { RealtimeGateway } from "../realtime/realtime.gateway.js";
+@Injectable()
+export class AgentMailPoller {private readonly logger=new Logger(AgentMailPoller.name);private running=false;constructor(private readonly discovery:DiscoveryService,private readonly events:RealtimeGateway){} @Cron("*/20 * * * * *") async poll(){if(this.running||!process.env.AGENTMAIL_API_KEY||!process.env.AGENTMAIL_INBOX)return;this.running=true;try{const result=await this.discovery.ingestAgentMail(process.env.AGENTMAIL_DEMO_USER_ID??"agentmail-demo");if(result.accounts.length)this.events.publish("discovery.account_found",result);}catch(error){this.logger.error("AgentMail polling failed",error instanceof Error?error.stack:undefined)}finally{this.running=false}}}
