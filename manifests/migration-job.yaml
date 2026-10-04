@@ -17,7 +17,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: migrate
-          image: kind-registry:5000/personal-agents/api:0.1.2
+          image: kind-registry:5000/personal-agents/api:0.1.3
           imagePullPolicy: Always
           command: ["node", "apps/api/scripts/migrate.mjs"]
           envFrom:
