@@ -1,0 +1,87 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 716B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-alpine
+#2 DONE 0.4s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 136B done
+#3 DONE 0.0s
+
+#4 [build  1/12] FROM docker.io/library/node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 7.03kB 0.0s done
+#5 DONE 0.0s
+
+#6 [build  7/12] COPY packages/agentmail/package.json packages/agentmail/package.json
+#6 CACHED
+
+#7 [build  2/12] WORKDIR /app
+#7 CACHED
+
+#8 [build  4/12] COPY apps/web/package.json apps/web/package.json
+#8 CACHED
+
+#9 [build  9/12] COPY packages/database/package.json packages/database/package.json
+#9 CACHED
+
+#10 [build  6/12] COPY packages/core/package.json packages/core/package.json
+#10 CACHED
+
+#11 [build  3/12] COPY package.json package-lock.json ./
+#11 CACHED
+
+#12 [build  5/12] COPY apps/api/package.json apps/api/package.json
+#12 CACHED
+
+#13 [build  8/12] COPY packages/mock-sites/package.json packages/mock-sites/package.json
+#13 CACHED
+
+#14 [build 10/12] RUN npm ci
+#14 CACHED
+
+#15 [build 11/12] COPY . .
+#15 DONE 0.0s
+
+#16 [build 12/12] RUN npm run build --workspace=@life-agent/web
+#16 0.658 
+#16 0.658 > @life-agent/web@0.1.0 build
+#16 0.658 > next build
+#16 0.658 
+#16 1.257 ▲ Next.js 16.3.8 (Turbopack)
+#16 1.310 ✓ Running next.config.ts took 53ms
+#16 1.320 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#16 1.320 This information is used to shape Next.js' roadmap and prioritize features.
+#16 1.320 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#16 1.320 https://nextjs.org/telemetry
+#16 1.320 
+#16 1.344 
+#16 1.416   Creating an optimized production build ...
+#16 9.218 ✓ Compiled successfully in 6.9s
+#16 9.230   Running TypeScript ...
+#16 17.60   Finished TypeScript in 8.4s ...
+#16 17.61   Collecting page data using 7 workers ...
+#16 19.15   Generating static pages using 7 workers (0/6) ...
+#16 19.95   Generating static pages using 7 workers (1/6) 
+#16 19.96   Generating static pages using 7 workers (2/6) 
+#16 20.56   Generating static pages using 7 workers (4/6) 
+#16 20.57 ✓ Generating static pages using 7 workers (6/6) in 1422ms
+#16 20.60   Finalizing page optimization ...
+#16 20.66 
+#16 20.67 Route (app)
+#16 20.67 ┌ ○ /
+#16 20.67 ├ ○ /_not-found
+#16 20.67 ├ ƒ /api/accounts
+#16 20.67 ├ ƒ /api/discovery
+#16 20.67 └ ƒ /api/plans/move
+#16 20.67 
+#16 20.67 
+#16 20.67 ○  (Static)   prerendered as static content
+#16 20.67 ƒ  (Dynamic)  server-rendered on demand
+#16 20.67 
+#16 DONE 21.0s
