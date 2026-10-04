@@ -37,10 +37,11 @@ metadata:
   name: personal-agents-web
   namespace: personal-agents-ns-1
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app.kubernetes.io/name: personal-agents-web
   ports:
     - name: http
       port: 3000
       targetPort: 3000
+      nodePort: 30003
