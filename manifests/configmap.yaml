@@ -5,6 +5,8 @@ metadata:
   namespace: personal-agents-ns-1
 data:
   API_PORT: "4000"
+  AGENTMAIL_INBOX: "haarish-agent@agentmail.to"
+  AGENTMAIL_DEMO_USER_ID: "agentmail-demo"
   WEB_ORIGIN: "http://localhost:3000"
   NEXT_PUBLIC_API_URL: "http://personal-agents-api.personal-agents-ns-1.svc.cluster.local:4000"
-  NEON_AI_GATEWAY_MODEL: "gpt-5-mini"
+  NEON_AI_GATEWAY_MODEL: "gpt-5-5"
