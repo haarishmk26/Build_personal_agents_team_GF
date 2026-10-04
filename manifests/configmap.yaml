@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: personal-agents-config
+  namespace: personal-agents-ns-1
+data:
+  API_PORT: "4000"
+  WEB_ORIGIN: "http://localhost:3000"
+  NEXT_PUBLIC_API_URL: "http://personal-agents-api.personal-agents-ns-1.svc.cluster.local:4000"
+  NEON_AI_GATEWAY_MODEL: "gpt-5-mini"
