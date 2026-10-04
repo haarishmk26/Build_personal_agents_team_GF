@@ -44,4 +44,4 @@ spec:
     - name: http
       port: 3001
       targetPort: 3000
-      nodePort: 30003
+      nodePort: 31777
