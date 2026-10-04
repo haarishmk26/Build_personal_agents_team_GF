@@ -1,9 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { createRemoteJWKSet, jwtVerify } from "jose";
+import type { Request as ExpressRequest } from "express";
 import { IS_PUBLIC } from "./public.decorator.js";
 
-type RequestWithUser = Request & { user?: { id: string; email?: string } };
+type RequestWithUser = ExpressRequest & { user?: { id: string; email?: string } };
 
 @Injectable()
 export class NeonAuthGuard implements CanActivate {
@@ -12,7 +13,8 @@ export class NeonAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     if (this.reflector.getAllAndOverride<boolean>(IS_PUBLIC, [context.getHandler(), context.getClass()])) return true;
     const request = context.switchToHttp().getRequest<RequestWithUser>();
-    const token = request.headers.get?.("authorization")?.replace(/^Bearer\s+/i, "") ?? (request.headers as Record<string, string | undefined>).authorization?.replace(/^Bearer\s+/i, "");
+    const authorization = request.headers.authorization;
+    const token = (Array.isArray(authorization) ? authorization[0] : authorization)?.replace(/^Bearer\s+/i, "");
     if (!token) throw new UnauthorizedException("A Neon Auth bearer token is required.");
     const jwksUrl = process.env.NEON_AUTH_JWKS_URL;
     if (!jwksUrl) throw new UnauthorizedException("Neon Auth is not configured on this service.");
