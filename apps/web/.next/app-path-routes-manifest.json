@@ -2,5 +2,7 @@
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
   "/api/accounts/route": "/api/accounts",
+  "/api/discovery/route": "/api/discovery",
+  "/api/plans/move/route": "/api/plans/move",
   "/page": "/"
 }

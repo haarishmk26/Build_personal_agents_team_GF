@@ -46,6 +46,18 @@
       "regex": "^/api/accounts(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/accounts(?:/)?$"
+    },
+    {
+      "page": "/api/discovery",
+      "regex": "^/api/discovery(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/discovery(?:/)?$"
+    },
+    {
+      "page": "/api/plans/move",
+      "regex": "^/api/plans/move(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/plans/move(?:/)?$"
     }
   ],
   "dataRoutes": [],
