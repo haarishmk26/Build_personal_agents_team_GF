@@ -1,26 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { DEFAULT_RULES, planMovingEvent, SEEDED_ACCOUNTS, type ChecklistItem } from "@life-agent/core";
+import { FormEvent, useCallback, useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { bearerToken, neonClient } from "./neon-auth";
 
-const nextStatus: Record<string, ChecklistItem["status"]> = {
-  "awaiting_approval": "awaiting_verification",
-  "awaiting_verification": "completed",
-  blocked: "awaiting_approval"
-};
-
+type Account={id:string;name:string;domain:string;category:string;tier:string;last_seen_at:string|null};
 export default function Home() {
-  const initialPlan = useMemo(() => planMovingEvent(SEEDED_ACCOUNTS, DEFAULT_RULES), []);
-  const [items, setItems] = useState(initialPlan);
-  const completeCount = items.filter((item) => item.status === "completed").length;
-  const advance = (id: string) => setItems((current) => current.map((item) => item.id === id ? { ...item, status: nextStatus[item.status] ?? item.status } : item));
-
-  return <main>
-    <header><span className="eyebrow">LIFE EVENT AGENT</span><h1>Your move is already in motion.</h1><p>Maya is moving to <strong>42 Oak St</strong> on Nov 1. We found five accounts with a stale address.</p></header>
-    <section className="summary"><div><span>Progress</span><strong>{completeCount} / {items.length}</strong></div><div><span>Rule active</span><strong>Ask before card-on-file changes</strong></div><div><span>Proof inbox</span><strong>AgentMail connected</strong></div></section>
-    <section className="layout">
-      <aside className="map"><h2>Account map</h2><p>Every circle is an account discovered from Maya’s mail.</p><div className="orbit"><div className="maya">Maya</div>{items.map((item, index) => <div key={item.id} className={`node n${index} ${item.status}`}>{item.account.name}</div>)}</div><div className="legend"><span className="dot ready" /> needs action <span className="dot done" /> verified</div></aside>
-      <section className="checklist"><div className="section-heading"><div><span className="eyebrow">MOVE CHECKLIST</span><h2>Review each change</h2></div><button className="quiet">Learned playbooks: 3</button></div>{items.map((item) => <article key={item.id} className={`card ${item.status}`}><div><span className="badge">{item.account.tier}</span><h3>{item.account.name}</h3><p>{item.reason}</p></div><div className="card-action"><span className="status">{item.status.replaceAll("_", " ")}</span>{item.status === "ready" && <button onClick={() => advance(item.id)}>Open kit</button>}{item.status === "blocked" && <button onClick={() => advance(item.id)}>Allow once</button>}{item.status === "awaiting_approval" && <button onClick={() => advance(item.id)}>Approve change</button>}{item.status === "awaiting_verification" && <button onClick={() => advance(item.id)}>Check confirmation</button>}{item.status === "completed" && <span className="verified">✓ Verified</span>}</div></article>)}</section>
-    </section>
-  </main>;
+  const [accounts,setAccounts]=useState<Account[]>([]); const [loading,setLoading]=useState(true); const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [error,setError]=useState<string|null>(null); const [signedIn,setSignedIn]=useState(false);
+  const load=useCallback(async()=>{const token=await bearerToken();if(!token){setSignedIn(false);setLoading(false);return;}const response=await fetch("/api/accounts",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});if(!response.ok){setError("Your session could not load accounts. Please sign in again.");setLoading(false);return;}setAccounts(await response.json());setSignedIn(true);setLoading(false);},[]);
+  useEffect(()=>{void load();const timer=window.setInterval(()=>void load(),30000);return()=>window.clearInterval(timer);},[load]);
+  async function signIn(event:FormEvent){event.preventDefault();setLoading(true);setError(null);try{const result=await (neonClient.auth as any).signInWithPassword({email,password});if(result?.error)throw new Error(result.error.message??"Sign-in failed");await load();}catch(reason){setError(reason instanceof Error?reason.message:"Sign-in failed");setLoading(false);}}
+  if(!signedIn)return <main className="mx-auto max-w-2xl px-6 py-24"><Badge variant="secondary">Neon Auth protected</Badge><h1 className="mt-4 text-5xl font-semibold tracking-tight">Bring your life admin together.</h1><p className="mt-4 text-muted-foreground">Sign in to see services discovered from your AgentMail inbox. The dashboard never reads a mailbox in the browser.</p><Card className="mt-8"><CardHeader><CardTitle>Sign in</CardTitle><CardDescription>Your session is issued by Neon Auth and is required by the API.</CardDescription></CardHeader><CardContent><form className="grid gap-4" onSubmit={signIn}><Input aria-label="Email" value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="you@example.com" required/><Input aria-label="Password" value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="Password" required/>{error&&<p className="text-sm text-destructive">{error}</p>}<Button disabled={loading} type="submit">{loading?"Checking session…":"Continue"}</Button></form></CardContent></Card></main>;
+  return <main className="mx-auto max-w-6xl px-6 py-16"><Badge variant="secondary">Live discovery</Badge><div className="mt-4 flex flex-wrap items-end justify-between gap-4"><div><h1 className="text-5xl font-semibold tracking-tight">Your real accounts, discovered from mail.</h1><p className="mt-3 max-w-2xl text-muted-foreground">AgentMail is checked every 20 seconds. Services are classified through Neon AI Gateway and persisted in Neon Postgres.</p></div><Button variant="outline" onClick={()=>void load()}>Refresh</Button></div><section className="mt-10 grid gap-4 md:grid-cols-3"><Card><CardHeader><CardDescription>Discovered services</CardDescription><CardTitle className="text-3xl">{accounts.length}</CardTitle></CardHeader></Card><Card><CardHeader><CardDescription>Polling</CardDescription><CardTitle>Every 20 seconds</CardTitle></CardHeader></Card><Card><CardHeader><CardDescription>Data path</CardDescription><CardTitle>AgentMail → Neon</CardTitle></CardHeader></Card></section><section className="mt-10"><h2 className="text-2xl font-semibold">Accounts requiring review</h2><div className="mt-4 grid gap-3">{accounts.length===0?<Card><CardContent className="py-6 text-muted-foreground">No accounts found yet. New AgentMail messages will appear here after the next discovery pass.</CardContent></Card>:accounts.map(account=><Card key={account.id}><CardContent className="flex items-center justify-between gap-4 py-5"><div><h3 className="font-medium">{account.name}</h3><p className="mt-1 text-sm text-muted-foreground">{account.category} · {account.domain}</p></div><Badge variant={account.tier==="assist"?"destructive":"secondary"}>{account.tier}</Badge></CardContent></Card>)}</div></section></main>;
 }
