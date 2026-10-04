@@ -9,6 +9,32 @@ One life event (new address, name change, new job) fans out to 30+ accounts, eac
 
 Why a general bot can't copy it: it depends on your inbox (the account graph), your approval history (your rules), your sent mail (your voice) and your life timeline.
 
+## 1a. Why this is not just a Claude Code session with email access
+
+A coding agent with inbox access could do a rough one-off version: scan mail, list accounts, fill a form. That is not our pitch. **Form filling is the commodity part. Our pitch is trusted delegation: memory, proactivity, verified completion and guardrails.** UI polish helps but is the easiest thing to copy, so it must not be our only answer.
+
+| Difference | A session with email access | This product |
+|---|---|---|
+| **Memory between runs** | Starts cold each time. You re-explain everything. | Keeps an account graph, your rules and a playbook per site. Faster every time. |
+| **Proactive** | Acts only when prompted. | Watches mail and calendar. "Lease ends in 60 days, checklist ready." Acts on forwarded bills. |
+| **Verified completion** | Says "done." | Marks done only when the confirmation email arrives. Keeps a log with undo steps and a proof pack. |
+| **Guardrails as product behavior** | Only as good as the prompt. One mistake can touch a real bank. | Risk tiers, user rules and approval before every submit are built in. |
+| **Own identity** | Uses your mailbox. | The agent has its own inbox (AgentMail) for codes, confirmations and forwards. |
+| **Who can use it** | Developers who can set it up. | Anyone. |
+
+**Ideas that make it harder to copy (mostly vision, not built today):**
+- **Shared playbooks across users.** Once one agent learns that a gym needs a phone call, everyone benefits. It gets stronger with more users, and a single session can't do it. It also fits the open-source side prize.
+- **Event templates with the real checklist.** Marriage, new baby, new job, moving abroad: the 30 things people forget, in order, with deadlines.
+- **Household mode.** Two people, shared accounts, separate approvals.
+- **The account map as a lasting asset.** A living inventory of where you exist online, with stale data, forgotten subscriptions and risk flags. Useful even when you are not moving.
+
+**Pitch rule:** do not lead with "it fills forms." Lead with "it remembers, it starts on its own, it proves it's done, and it won't do anything risky without you."
+
+**The three differentiators we must show on stage:**
+1. A **proactive trigger** (predicted event or forward-to-act).
+2. **Verified completion** with the history log and proof pack.
+3. **Visible learning** (learned rules and the playbook counter).
+
 ## 2. What the user sees
 
 Example user: Maya, moving to 42 Oak St on Nov 1.
@@ -82,6 +108,8 @@ Each mock site: small standalone web app with a login, a seeded user (Maya), a w
 7. Proof pack PDF
 8. Life timeline and predicted events, deadline tracking
 
+**Differentiator priorities (from section 1a):** at least one proactive trigger, verified completion with the log and proof pack, and visible learning must be in the demo. If time is short, protect these over extra sites or UI polish. Forward-to-act and predicted events are the cheapest proactive triggers, so treat them as higher priority than the order above suggests.
+
 **Cut unless time remains:** household mode (pitch slide only), cost saver, breach check, voice-matched drafting, throwaway aliases per site, unknown-site solver.
 
 ## 7. Architecture (stack-agnostic)
@@ -114,6 +142,7 @@ Units:
 
 ## 8. Demo script (about 4 minutes)
 
+0. Open with the proactive trigger: the agent says "Your lease ends in 60 days, I've prepared a move checklist," or a forwarded bill gets turned into a task.
 1. Run the audit: "5 accounts still have your old address."
 2. Say "I'm moving to 42 Oak St." The plan appears.
 3. Approve IronWorks: green after its email.
@@ -148,6 +177,7 @@ Work streams (assign once team size is known): mock sites and email, agent logic
 - Browser automation flakiness: all five mock sites give a guaranteed path.
 - Email send between inbox and itself may be restricted: fallback in section 4.
 - Scope: ordered list in section 6, cut from the bottom.
+- Looking like "just Claude Code with a UI": lead the pitch with section 1a, and make sure the three differentiators are visible in the demo.
 - Secrets: `.env` gitignored, checked against history before every push.
 
 ## 11. Open decisions
