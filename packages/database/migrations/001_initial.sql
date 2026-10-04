@@ -1,0 +1,7 @@
+create table app_user (id text primary key, email text unique, created_at timestamptz not null default now());
+create table life_event (id uuid primary key, user_id text not null references app_user(id), type text not null, payload jsonb not null, status text not null default 'draft', created_at timestamptz not null default now());
+create table account (id uuid primary key, user_id text not null references app_user(id), name text not null, domain text not null, category text not null, tier text not null, stale_fields jsonb not null default '[]', last_seen_at timestamptz, unique(user_id, domain));
+create table checklist_item (id uuid primary key, event_id uuid not null references life_event(id), account_id uuid not null references account(id), status text not null, action text not null, reason text not null, requires_approval boolean not null, created_at timestamptz not null default now());
+create table approval (id uuid primary key, checklist_item_id uuid not null references checklist_item(id), user_id text not null references app_user(id), decision text not null, created_at timestamptz not null default now());
+create table playbook (id uuid primary key, domain text not null unique, steps jsonb not null, quirks text, success_count integer not null default 0);
+create table proof (id uuid primary key, checklist_item_id uuid not null references checklist_item(id), kind text not null, reference text, observed_at timestamptz not null default now());
